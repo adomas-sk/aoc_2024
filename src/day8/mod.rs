@@ -3,7 +3,7 @@ use std::cmp::min;
 use crate::read_input;
 
 pub fn solution() {
-    println!("Day 7");
+    println!("Day 8");
     part1();
     part2();
     println!("");
