@@ -6,7 +6,8 @@
 // mod day6;
 // mod day7;
 // mod day8;
-mod day9;
+// mod day9;
+mod day10;
 mod read_input;
 
 fn main() {
@@ -18,5 +19,6 @@ fn main() {
     // day6::solution(); // Part2 takes good 10min to compute
     // day7::solution();
     // day8::solution();
-    day9::solution();
+    // day9::solution();
+    day10::solution();
 }
