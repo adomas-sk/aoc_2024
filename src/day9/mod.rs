@@ -74,7 +74,115 @@ fn part1() {
     println!("Part1: {total}");
 }
 
-fn part2() {}
+#[derive(Debug, Clone, Copy)]
+struct DiskSpace {
+    empty: bool,
+    id: usize,
+    amount: usize,
+}
+
+fn parse_disk_space_with_meta(compressed: &Vec<usize>) -> Vec<DiskSpace> {
+    let mut disk_spaces: Vec<DiskSpace> = Vec::new();
+
+    let mut is_file = true;
+    let mut file_id = 0;
+    for number in compressed {
+        let disk_space = DiskSpace {
+            empty: !is_file,
+            id: file_id,
+            amount: *number,
+        };
+        disk_spaces.push(disk_space);
+        if !is_file {
+            file_id += 1;
+        }
+        is_file = !is_file;
+    }
+    return disk_spaces;
+}
+
+fn optimize_disk_space(disk_spaces: &Vec<DiskSpace>) -> Vec<DiskSpace> {
+    let mut compact: Vec<DiskSpace> = disk_spaces.iter().map(|space| space.clone()).collect();
+
+    loop {
+        let mut found_optimization = false;
+
+        'outer: for end_index in (0..compact.len()).rev() {
+            let end = compact[end_index];
+            if !end.empty {
+                for start_index in 0..end_index {
+                    let start = compact[start_index];
+                    if start.empty && start.amount >= end.amount {
+                        if start.amount == end.amount {
+                            let empty_for_end = DiskSpace {
+                                empty: true,
+                                id: 0,
+                                amount: end.amount,
+                            };
+                            let temp = compact
+                                .splice(end_index..end_index + 1, vec![empty_for_end])
+                                .collect::<Vec<DiskSpace>>();
+                            compact.splice(start_index..start_index + 1, temp);
+                        } else {
+                            let empty_for_start = DiskSpace {
+                                empty: true,
+                                id: 0,
+                                amount: start.amount - end.amount,
+                            };
+                            let empty_for_end = DiskSpace {
+                                empty: true,
+                                id: 0,
+                                amount: end.amount,
+                            };
+                            let mut temp = compact
+                                .splice(end_index..end_index + 1, vec![empty_for_end])
+                                .collect::<Vec<DiskSpace>>();
+                            temp.push(empty_for_start);
+                            compact.splice(start_index..start_index + 1, temp);
+                        }
+                        found_optimization = true;
+                        break 'outer;
+                    }
+                }
+            }
+        }
+        if !found_optimization {
+            break;
+        }
+    }
+
+    return compact;
+}
+
+fn part2() {
+    let input = read_input::read_input("src/day9/input.txt");
+    let list = parse_input(&input);
+
+    let disk_space = parse_disk_space_with_meta(&list);
+
+    let optimized = optimize_disk_space(&disk_space);
+
+    let mut final_disk: Vec<String> = Vec::new();
+    for space in optimized.iter() {
+        for _ in 0..space.amount {
+            if space.empty {
+                final_disk.push(String::from("."));
+            } else {
+                final_disk.push(space.id.to_string());
+            }
+        }
+    }
+
+    let mut total = 0;
+    for (i, number) in final_disk.iter().enumerate() {
+        if number != "." {
+            let sum = i * (*number).parse::<usize>().unwrap();
+            total += sum;
+        }
+    }
+
+    println!("Part2: {total}");
+}
 
 fn parse_input(input: &String) -> Vec<usize> {
     let parsed: Vec<usize> = input
