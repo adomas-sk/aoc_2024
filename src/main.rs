@@ -7,7 +7,8 @@
 // mod day7;
 // mod day8;
 // mod day9;
-mod day10;
+// mod day10;
+mod day11;
 mod read_input;
 
 fn main() {
@@ -20,5 +21,6 @@ fn main() {
     // day7::solution();
     // day8::solution();
     // day9::solution();
-    day10::solution();
+    // day10::solution();
+    day11::solution();
 }
